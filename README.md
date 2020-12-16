@@ -36,7 +36,7 @@ The following folder structure should exist
 
 n.b. can be run on one to as many read files as needed, each pair of reads should have it's own folder.
 
-will create **pipeline** folder in <sample_folder> with output.
+will create all the output data in <sample_folder>.
 
 
 
