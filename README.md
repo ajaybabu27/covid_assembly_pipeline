@@ -15,11 +15,11 @@ you may need to update conda before creation
 
 ```conda update conda```
 
-Edit covid_assembly_pipeline_wrapper_example.sh script to run the pipeline. After editing pass the sample folder with raw reads using the following command
+Edit covid_assembly_pipeline_wrapper_example.sh script and run the pipeline using the following command
 
 ``` ./covid_assembly_pipeline_wrapper.sh /sc/arion/projects/PVI/genomes/assembly/run_folder/sample_folder```
 
-The pipeline automatically determines Thermo vs Illumina libraries and runs accordingly. 
+The pipeline automatically determines Thermo vs Illumina libraries and runs accordingly.
 
 
 The following folder structure should exist
