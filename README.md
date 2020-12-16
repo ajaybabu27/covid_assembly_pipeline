@@ -41,7 +41,7 @@ The following folder structure should exist for <sample_folder>
 
 n.b. can be run on one to as many read files as needed, each pair of reads should have it's own folder. 
 
-will create all the output data in <sample_folder>.
+The pipeline creates all the output data in <sample_folder> and pushes the assembly info to pathogenDB.
 
 
 
