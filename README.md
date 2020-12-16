@@ -22,7 +22,7 @@ Edit covid_assembly_pipeline_wrapper_example.sh script and run the pipeline usin
 The pipeline automatically determines Thermo vs Illumina libraries and runs accordingly.
 
 
-The run folder must be in the following format
+The run folder name must be in the following format
 ```
 <runID_pipeline>
 ```
