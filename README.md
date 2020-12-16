@@ -1,6 +1,6 @@
 ### covid_assembly_pipeline
 
-This is a wrapper pipeline for the https://github.com/mjsull/COVID_pipe which pushes the data to PathogenDB.
+This is a wrapper pipeline for the https://github.com/mjsull/COVID_pipe repo. This wrapper pushes the data to PathogenDB.
 
 #### To run this pipeline first create the conda environment for it to run in.
 
