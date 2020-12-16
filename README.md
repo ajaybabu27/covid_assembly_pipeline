@@ -24,7 +24,8 @@ The pipeline automatically determines Thermo vs Illumina libraries and runs acco
 
 The following folder structure should exist
  
-```<sample_folder>
+```
+<sample_folder>
 └───<sample_library1>'
 │   │   <read_prefix>_1.fastq.gz
 │   │   <read_prefix>_2.fastq.gz
