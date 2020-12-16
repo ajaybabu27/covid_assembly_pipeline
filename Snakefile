@@ -1,6 +1,6 @@
 rule all:
 	input:
-		vadr_error_file=os.environ.get("sample_folder")+'/pipeline/VADR/VADR.vadr.fail.tbl'
+		qc_file=os.environ.get("sample_folder")+'/QC/'+'quality_control.pdf'
 
 rule assemble:
 	message: "Assembling SARS-CoV-2 genome"
