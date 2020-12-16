@@ -35,7 +35,10 @@ The following folder structure should exist
     │   <read_prefix>_2.fastq.gz
 ```
 
-n.b. can be run on one to as many read files as needed, each pair of reads should have it's own folder.
+n.b. can be run on one to as many read files as needed, each pair of reads should have it's own folder. The run folder must be in the following format
+```
+<runID_pipeline>
+```
 
 will create all the output data in <sample_folder>.
 
