@@ -22,7 +22,11 @@ Edit covid_assembly_pipeline_wrapper_example.sh script and run the pipeline usin
 The pipeline automatically determines Thermo vs Illumina libraries and runs accordingly.
 
 
-The following folder structure should exist
+The run folder must be in the following format
+```
+<runID_pipeline>
+```
+The following folder structure should exist for <sample_folder>
  
 ```
 <sample_folder>
@@ -35,10 +39,7 @@ The following folder structure should exist
     │   <read_prefix>_2.fastq.gz
 ```
 
-n.b. can be run on one to as many read files as needed, each pair of reads should have it's own folder. The run folder must be in the following format
-```
-<runID_pipeline>
-```
+n.b. can be run on one to as many read files as needed, each pair of reads should have it's own folder. 
 
 will create all the output data in <sample_folder>.
 
