@@ -1,0 +1,3 @@
+covid_assembly_pipeline_wrapper.sh
+Snakefile_dev
+.snakemake/
