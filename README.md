@@ -8,7 +8,8 @@ This is a wrapper pipeline for the https://github.com/mjsull/COVID_pipe repo. Th
 
 ```conda env create --file env.yml```
 
-```conda activate COVID```
+Test if the conda environment works:
+```conda activate covid``` 
 
 you may need to update conda before creation
 
