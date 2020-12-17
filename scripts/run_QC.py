@@ -9,7 +9,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import statistics
 
 def create_plots(sample_folder, amplified, threads, read1_suffix, read2_suffix, krakendb):
-    repo_dir = sys.path[0]
+    repo_dir = args.repo_dir
     qc_dir = sample_folder + '/QC'
     if not os.path.exists(qc_dir):
         os.makedirs(qc_dir)
@@ -310,7 +310,7 @@ def create_plots(sample_folder, amplified, threads, read1_suffix, read2_suffix, 
 
 
 def create_plots_thermo(sample_folder, amplified, threads, krakendb):
-    repo_dir = sys.path[0]
+    repo_dir = args.repo_dir
     sample = os.path.basename(sample_folder.rstrip('/'))
     qc_dir = sample_folder + '/QC'
     if not os.path.exists(qc_dir):
@@ -470,7 +470,7 @@ parser = argparse.ArgumentParser(prog='COVID pipeline QC', formatter_class=argpa
                                             'License: GPLv3\n'
                                             'USAGE: python run_QC.py -i sample1' % __version__)
 
-
+parser.add_argument('-rd', '--repo_dir', action='store', help='path to repo dir')
 parser.add_argument('-i', '--illumina_folder', action='store', help='Sample folder created by process_run.py')
 parser.add_argument('-b', '--thermo_folder', action='store', help='Sample folder created by process_run.py')
 parser.add_argument('-a', '--not_amplified', action='store_true', help="Skip cutadapt")

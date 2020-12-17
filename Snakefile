@@ -1,6 +1,6 @@
 rule all:
 	input:
-		qc_file=os.environ.get("sample_folder")+'/QC/'+'quality_control.pdf'
+		pdb_upload_check=os.environ.get("sample_folder")+'/pdb_upload_complete.txt'
 
 rule assemble:
 	message: "Assembling SARS-CoV-2 genome"
@@ -8,16 +8,15 @@ rule assemble:
 		sample_folder=os.environ.get("sample_folder")
 	params:		
 		sample_name=os.environ.get("sample_name"),
-		run_ID=os.environ.get("run_ID")
-	output:
-		#consensus_fasta_file="{input.sample_folder}/pipeline/{params.sample_name}.fasta"
+		repo_dir=os.environ.get("repo_dir")		
+	output:		
 		consensus_fasta_file=os.environ.get("sample_folder")+'/pipeline/'+os.environ.get("sample_name")+'.fasta'
 	shell:		
 		"""
 		if [ -d {input.sample_folder}/bams ]; then
-			python scripts/run_pipeline.py -b {input.sample_folder}
+			python scripts/run_pipeline.py -rd {params.repo_dir} -b {input.sample_folder}
 		else
-			python scripts/run_pipeline.py -i {input.sample_folder} -s {params.sample_name} -r1 _R1_001.fastq.gz -r2 _R2_001.fastq.gz			
+			python scripts/run_pipeline.py -rd {params.repo_dir} -i {input.sample_folder} -s {params.sample_name} -r1 _R1_001.fastq.gz -r2 _R2_001.fastq.gz			
 		fi
 		"""
 
@@ -26,14 +25,16 @@ rule variant_analysis:
 	input:
 	    sample_folder=os.environ.get("sample_folder"),
 		consensus_fasta_file=os.environ.get("sample_folder")+'/pipeline/'+os.environ.get("sample_name")+'.fasta'
+	params:		
+		repo_dir=os.environ.get("repo_dir")
 	output:
 		pileup_file=os.environ.get("sample_folder")+'/variants/'+'pileup'
 	shell:
 		"""
 		if [ -d {input.sample_folder}/bams ]; then
-			python scripts/variant_analysis.py -b {input.sample_folder}
+			python scripts/variant_analysis.py -rd {params.repo_dir} -b {input.sample_folder}
 		else
-			python scripts/variant_analysis.py -i {input.sample_folder}
+			python scripts/variant_analysis.py -rd {params.repo_dir} -i {input.sample_folder}
 		fi
 		"""
 
@@ -44,21 +45,53 @@ rule QC_analysis:
 		pileup_file=os.environ.get("sample_folder")+'/variants/'+'pileup'
 	params:		
 		sample_name=os.environ.get("sample_name"),
+		repo_dir=os.environ.get("repo_dir"),
 		run_ID=os.environ.get("run_ID")
 	output:
 		qc_file=os.environ.get("sample_folder")+'/QC/'+'quality_control.pdf'
 	shell:
 		"""
 		if [ -d {input.sample_folder}/bams ]; then
-			python scripts/run_QC.py -b {input.sample_folder} -kdb /sc/arion/projects/PVI/db/minikraken_8GB_20200312
+			python scripts/run_QC.py -rd {params.repo_dir} -b {input.sample_folder} -kdb /sc/arion/projects/PVI/db/minikraken_8GB_20200312
 		else
-			python scripts/run_QC.py -i {input.sample_folder} -kdb /sc/arion/projects/PVI/db/minikraken_8GB_20200312
+			python scripts/run_QC.py -rd {params.repo_dir} -i {input.sample_folder} -kdb /sc/arion/projects/PVI/db/minikraken_8GB_20200312
 		fi
 		module load R
-		Rscript plot-coverage-report.R -i {input.sample_folder}/variants/variable_bases.tsv -o {input.sample_folder}/variants/{params.sample_name}"_"var
+		Rscript scripts/plot-coverage-report.R -i {input.sample_folder}/variants/variable_bases.tsv -o {input.sample_folder}/variants/{params.sample_name}"_"var
 
 		pdfunite {input.sample_folder}/QC/quality_control.pdf {input.sample_folder}/variants/{params.sample_name}"_"var.pdf {input.sample_folder}/QC/quality_control2.pdf
 		mv {input.sample_folder}/QC/quality_control2.pdf {input.sample_folder}/QC/quality_control.pdf
 		rm {input.sample_folder}/variants/{params.sample_name}"_"var.pdf
+		"""
 
+rule vadr_analysis:
+	message: "Perform VADR analysis on the SARS-CoV-2 genome"
+	input:
+	    consensus_fasta_file=os.environ.get("sample_folder")+'/pipeline/'+os.environ.get("sample_name")+'.fasta'
+	params:
+		sample_folder=os.environ.get("sample_folder"),	
+		sample_name=os.environ.get("sample_name")		
+	output:
+		vadr_error_file=os.environ.get("sample_folder")+'/pipeline/VADR/VADR.vadr.fail.tbl'
+	shell:		
+		"python scripts/vadr_run.py {input.consensus_fasta_file} {params.sample_folder}/pipeline/VADR {params.sample_folder}/pipeline/VADR/VADR.gff /sc/arion/projects/PVI/db/vadr-models-corona-1.1-1"
+		#python scripts/vadr_run.py os.environ.get("sample_folder")+"/pipeline/"+os.environ.get("sample_name")+".fasta" os.environ.get("sample_folder")+"/pipeline/VADR" os.environ.get("sample_folder")+"/pipeline/VADR/VADR.gff" /sc/arion/projects/PVI/db/vadr-models-corona-1.1-1
+		
+		
+rule push_data_pathogendb:
+	message: "Push genome assembly data to pathogenDB"
+	input:
+		qc_file=os.environ.get("sample_folder")+'/QC/'+'quality_control.pdf'
+	params:
+		sample_folder=os.environ.get("sample_folder"),
+		sample_name=os.environ.get("sample_name"),
+		run_ID=os.environ.get("run_ID").split("_")[0]
+	output:
+		pdb_upload_check=os.environ.get("sample_folder")+'/pdb_upload_complete.txt'
+	shell:
+		"""	
+		module purge
+		module load python/2.7.16
+		python scripts/push_pathogendb.py {params.sample_name} {params.run_ID}
+		touch {params.sample_folder}/pdb_upload_complete.txt
 		"""

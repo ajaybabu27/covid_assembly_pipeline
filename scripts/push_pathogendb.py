@@ -5,6 +5,7 @@
 @Created: 07-21-2020
 @Description: This script updates assembly stats in the assembly table and the genome, cds and protein sequences in the assembly_sequences table in pathogendb
 """
+
 from __future__ import division
 from Bio import SeqIO
 import mysql.connector
@@ -16,8 +17,7 @@ import os.path
 import shutil
 from datetime import datetime
 
-
-path = os.path.expanduser('~') + '/.my.cnf2'
+path = os.path.expanduser('~') + '/.my.cnf.pdbrw'
 with open(path) as cnf_file:
 	for line in cnf_file:
 		if line.startswith('user='):
@@ -63,7 +63,7 @@ else:
     base_dir='/sc/arion/projects/PVI/genomes/assembly'
 try:	
 	sample_path_qc=base_dir+'/'+run+'_pipeline/'+sample+'/QC'	
-	sample_path_variants=base_dir+'/'+run+'_pipeline/'+sample+'/variants'
+	sample_path_variants=base_dir+'/'+run+'_pipeline/'+sample+'/variants'	
 	bacteria_reads=0
 	eukaryote_reads=0
 	coronavirus_reads=0
@@ -143,7 +143,7 @@ try:
             
 	
 	
-	if update=='no':
+	if update=='no':		
 		cur=db.cursor()
 		cur.execute("INSERT INTO `tCEIRS_assemblies` (`Extract_ID`, `assembly_run`, `assembly_status`, `Total_reads`,`Uniq_mapped_read_percent`,`Short_unmapped_read_percent`,`completeness`,`IAV_percent`,`IBV_percent`,`coronavirus_percent`,`Eukaryota_percent`,`Bacteria_percent`,`Assembly_quality`,`Variant_pos_sum_15pct`) VALUES ('%s','%s','%s','%i','%f','%f','%f','%f','%f','%f','%f','%f','%s','%i')" %(extract_id,run,assembly_status,total_reads,unique_mapped_per,short_unmapped_per,completeness,iav_per,ibv_per,cor_per,euk_per,bact_per,assembly_quality,var15_count))
 		assembly_id=cur.lastrowid

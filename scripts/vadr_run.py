@@ -6,6 +6,7 @@ vadr_db = sys.argv[4]
 
 subprocess.Popen("v-annotate.pl -r -f -s --nomisc --lowsimterm 2 --mxsize 64000 --mdir %s" \
                  " --mkey NC_045512 --fstlowthr 0.0 --alt_fail lowscore,fsthicnf,fstlocnf --lowsc 0.75 %s %s" % (vadr_db,fasta_file, working_dir), shell=True).wait()
+
 with open(out_gff, 'w') as o:
     o.write("##gff-version 3\n")
     length = 0
@@ -45,4 +46,4 @@ with open(out_gff, 'w') as o:
     with open(fasta_file) as f:
         for line in f:
             o.write(line)
-            
+           

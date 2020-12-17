@@ -130,6 +130,7 @@ parser = argparse.ArgumentParser(prog='contamination_analysis.py', formatter_cla
                                             'License: GPLv3\n'
                                             'USAGE: python -p output.pileup -m multiple_alignment -r reference_name -t tree.nwk' % __version__)
 
+parser.add_argument('-rd', '--repo_dir', action='store', help='path to repo dir')
 parser.add_argument('-i', '--input_dir', action='store', help='automatically run on directory')
 parser.add_argument('-o', '--out_file', action='store', help='automatically run on directory')
 parser.add_argument('-m', '--multiple_alignment', action='store', help='number of threads to use')
@@ -146,7 +147,7 @@ parser.add_argument('-b', '--min_base', action='store', default=2, help='minimum
 args = parser.parse_args()
 
 if not args.input_dir is None:
-    repo_dir = sys.path[0]
+    repo_dir = args.repo_dir
     working_dir = args.input_dir + "/contamination_analysis"
     if not os.path.exists(working_dir):
         os.makedirs(working_dir)

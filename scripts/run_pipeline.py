@@ -5,7 +5,7 @@ import subprocess
 import sys, os
 
 
-repo_dir = sys.path[0]
+
 virus_length = 29903
 
 def run_illumina(args):
@@ -306,7 +306,7 @@ parser = argparse.ArgumentParser(prog='COVID pipeline', formatter_class=argparse
                                             '    │   <read_prefix>_1.fastq.gz\n'
                                             '    │   <read_prefix>_2.fastq.gz\n' % __version__)
 
-
+parser.add_argument('-rd', '--repo_dir', action='store', help='path to repo dir')
 parser.add_argument('-i', '--sample_folder', action='store', help='Sample folder created by process_run.py')
 parser.add_argument('-b', '--thermo_fischer', action='store', help='Sample folder with thermofischer bams present')
 parser.add_argument('-p', '--ccs_reads', action='store', help='Pacbio CCS reads')
@@ -327,7 +327,7 @@ if args.version:
     sys.stdout.write('Version %s' % __version__)
     sys.exit()
 
-
+repo_dir = args.repo_dir
 if not args.ccs_reads is None:
     run_ccs(args)
 elif not args.thermo_fischer is None:

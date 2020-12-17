@@ -7,7 +7,7 @@ def run_variant_analysis(args):
     outdir = sample_folder + '/variants'
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    repo_dir = sys.path[0]
+    repo_dir = args.repo_dir
     bam = "%s/pipeline/ref.bam" % sample_folder
     ref_fasta = "%s/db/COVID.fa" % repo_dir
     subprocess.Popen("samtools mpileup -f %s %s > %s/pileup" % (ref_fasta, bam, outdir), shell=True).wait()
@@ -146,7 +146,7 @@ def run_variant_analysis_thermo(args):
     outdir = sample_folder + '/variants'
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    repo_dir = sys.path[0]
+    repo_dir = args.repo_dir
     bam = "%s/pipeline/ref_mapq80.bam" % sample_folder
     ref_fasta = "%s/db/COVID.fa" % repo_dir
     subprocess.Popen("samtools mpileup -f %s %s > %s/pileup" % (ref_fasta, bam, outdir), shell=True).wait()
@@ -288,12 +288,10 @@ parser = argparse.ArgumentParser(prog='COVID variant pipeline', formatter_class=
                                             'License: GPLv3\n'
                                             'USAGE: python run_QC.py -i sample1' % __version__)
 
-
+parser.add_argument('-rd', '--repo_dir', action='store', help='path to repo dir')
 parser.add_argument('-i', '--illumina_folder', action='store', help='Sample folder created by process_run.py')
 parser.add_argument('-b', '--thermo_folder', action='store', help='Sample folder created by process_run.py')
 parser.add_argument('-m', '--min_ratio', action='store', default=0.9, help='number of threads to use')
-
-
 
 args = parser.parse_args()
 
