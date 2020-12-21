@@ -17,7 +17,7 @@ you may need to update conda before creation
 
 Edit covid_assembly_pipeline_wrapper_example.sh script and run the pipeline using the following command
 
-``` ./covid_assembly_pipeline_wrapper.sh /sc/arion/projects/PVI/genomes/assembly/<run_folder>/<sample_folder>```
+``` ./covid_assembly_pipeline_wrapper.sh <run_folder>/<sample_folder>```
 
 The pipeline automatically determines Thermo vs Illumina libraries and runs accordingly.
 
