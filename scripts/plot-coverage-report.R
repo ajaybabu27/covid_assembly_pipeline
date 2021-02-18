@@ -70,9 +70,11 @@ if(!any(names(d.var) %in% c("reference","position","reference_base","reference_b
 
 # Get minor variants ### Anotate deletions and insertions if present####
 d.var$depth = rowSums(d.var[,13:23])
-alt.ratio  = data.frame(A=(d.var$A+d.var$a)/d.var$depth, T=(d.var$T+d.var$t)/d.var$depth, C=(d.var$C+d.var$c)/d.var$depth, G=(d.var$G+d.var$g)/d.var$depth, ins = d.var$insertion/d.var$depth, del = d.var$deletion/d.var$depth ) ;
+colnames(d.var)[colnames(d.var) %in% c("insertion", "deletion")] = c("ins", "del")
+alt.ratio  = data.frame(A=(d.var$A+d.var$a)/d.var$depth, T=(d.var$T+d.var$t)/d.var$depth, C=(d.var$C+d.var$c)/d.var$depth, G=(d.var$G+d.var$g)/d.var$depth, ins = d.var$ins/d.var$depth, del = d.var$del/d.var$depth ) ;
 set.var    = apply(alt.ratio >= opt$varthr & alt.ratio < 0.5, 1, any)
 alt.ratio  = alt.ratio[set.var,];
+alt.ratio  = alt.ratio[complete.cases(alt.ratio),];
 alt.bases  = apply(alt.ratio, 1, function(x, thr, bases){paste(as.character(bases[x>=thr & x<0.5]), collapse="/")}, opt$varthr, names(alt.ratio))
 
 # Annotate only variants present in both forward and reverse reads
@@ -84,7 +86,7 @@ if (any(set.var)) {
       row = as.numeric(names(alt.bases)[i])
       base = unlist(strsplit(base,"/"))
       # check that base is not the same as pilon base
-      if (base %in% c("ins", "del")) {
+      if (any(c("ins", "del") %in% base)) {
         keep.vars = c(keep.vars,i)
       } else {
         if(d.var[row,base] > 0 & d.var[row,tolower(base)] > 0){
@@ -96,7 +98,11 @@ if (any(set.var)) {
           if (length(all.bases) == 1){
             alt.bases[[i]] = ""
           } else {
-            alt.bases[[i]] = all.bases[!all.bases %in% base]
+            if (all(all.bases %in% base)){
+              alt.bases[[i]] = i 
+            } else {
+              alt.bases[[i]] = all.bases[!all.bases %in% base]
+            }
           }
           
         } 
@@ -114,66 +120,66 @@ if (any(set.var)) {
 
 # Open plot file
 pdf(file=paste(opt$output, "pdf", sep="."));
-
-# Make coverage plots
-par(mfrow=c(opt$rows,opt$cols), mar=c(5,4,2,5)+.1, cex=opt$scale);
-
-# Subset data
-d.var[,7] = d.var[,7]/1000;
-
-x.cov    = d.var[,2];
-y.cov    = d.var[,7];
-
-# Plot coverage data
-if (!is.null(opt$ylim)){
-  ylim = as.numeric(unlist(strsplit(opt$ylim, split=",")));
-  if (length(ylim) != 2) stop("Error: ylim must have two values 'min,max'");
-  ylim = sort(ylim);
-}else{
-  ylim = c(0, max(y.cov));
-}
-plot(x.cov,y.cov, type="n",xlab="Position (bp)", ylab="Base coverage (x 1000)", ylim=ylim, main='Intra-host variance plot');
-if(opt$lowcov){
-  lowcov = x.cov[y.cov<opt$lowcov]
-  lines(lowcov,rep(ylim[2],length(lowcov)),type="h", col=rgb(229/255,229/255,229/255));
-}
-if (is.null(opt$bars)){
-  polygon(c(min(x.cov), x.cov, max(x.cov)), c(0, y.cov, 0), lwd=1.5, col=rgb(97/255,156/255,255/255,0.3), border=rgb(97/255,156/255,255/255));
-}else{
-  lines(x.cov,y.cov,type="h");
-}
-
-# Plot vertical lines
-if (!is.null(opt$markers)){
-  #set.mrk     = d.mrk[d.mrk[,1]==seg,];
-  for (pos in 1:nrow(d.mrk)){
-    abline(v=d.mrk[pos,2], col="blue");
-  }
-}
-
-# Plot median coverage
-median.cov = tapply(d.var[,7],d.var[,1], median);
-names(median.cov) = opt$output;
-abline(h=median.cov, col="green");
-text(5000, 1.2*median.cov, paste("median coverage", median.cov, "x 1000", sep = " "), cex = 0.8, col="blue");
-
-# Get available variant data
-d.var[,8] = as.character(d.var[,8])
-d.var[,8] = as.numeric(d.var[,8])
-x.var    = d.var[,2];
-y.var    = 1-d.var[,8];
-# Correct minor variants with higher frequency > 0.5
-y.var[y.var > 0.5] = 1 - y.var[y.var > 0.5];
-
-# Plot variant data
-par(new=TRUE, cex=opt$scale);
-plot(x.var, y.var, type="h", lwd=1.5, xaxt="n",yaxt="n",xlab="",ylab="", ylim=c(0,0.5), col=rgb(180/255,6/255,205/255));
-grid();
-axis(4);
-mtext("Variant frequency",side=4,line=3, las=0, cex=opt$scale);
-
-# Plot variant labels
 tryCatch( { 
+  
+  # Make coverage plots
+  par(mfrow=c(opt$rows,opt$cols), mar=c(5,4,2,5)+.1, cex=opt$scale);
+  
+  # Subset data
+  d.var[,7] = d.var[,7]/1000;
+  
+  x.cov    = d.var[,2];
+  y.cov    = d.var[,7];
+  
+  # Plot coverage data
+  if (!is.null(opt$ylim)){
+    ylim = as.numeric(unlist(strsplit(opt$ylim, split=",")));
+    if (length(ylim) != 2) stop("Error: ylim must have two values 'min,max'");
+    ylim = sort(ylim);
+  }else{
+    ylim = c(0, max(y.cov));
+  }
+  plot(x.cov,y.cov, type="n",xlab="Position (bp)", ylab="Base coverage (x 1000)", ylim=ylim, main='Intra-host variance plot');
+  if(opt$lowcov){
+    lowcov = x.cov[y.cov<opt$lowcov]
+    lines(lowcov,rep(ylim[2],length(lowcov)),type="h", col=rgb(229/255,229/255,229/255));
+  }
+  if (is.null(opt$bars)){
+    polygon(c(min(x.cov), x.cov, max(x.cov)), c(0, y.cov, 0), lwd=1.5, col=rgb(97/255,156/255,255/255,0.3), border=rgb(97/255,156/255,255/255));
+  }else{
+    lines(x.cov,y.cov,type="h");
+  }
+  
+  # Plot vertical lines
+  if (!is.null(opt$markers)){
+    #set.mrk     = d.mrk[d.mrk[,1]==seg,];
+    for (pos in 1:nrow(d.mrk)){
+      abline(v=d.mrk[pos,2], col="blue");
+    }
+  }
+  
+  # Plot median coverage
+  median.cov = tapply(d.var[,7],d.var[,1], median);
+  names(median.cov) = opt$output;
+  abline(h=median.cov, col="green");
+  text(5000, 1.2*median.cov, paste("median coverage", median.cov, "x 1000", sep = " "), cex = 0.8, col="blue");
+  
+  # Get available variant data
+  d.var[,8] = as.character(d.var[,8])
+  d.var[,8] = as.numeric(d.var[,8])
+  x.var    = d.var[,2];
+  y.var    = 1-d.var[,8];
+  # Correct minor variants with higher frequency > 0.5
+  y.var[y.var > 0.5] = 1 - y.var[y.var > 0.5];
+  
+  # Plot variant data
+  par(new=TRUE, cex=opt$scale);
+  plot(x.var, y.var, type="h", lwd=1.5, xaxt="n",yaxt="n",xlab="",ylab="", ylim=c(0,0.5), col=rgb(180/255,6/255,205/255));
+  grid();
+  axis(4);
+  mtext("Variant frequency",side=4,line=3, las=0, cex=opt$scale);
+  
+# Plot variant labels
   if (any(set.var)){
     mv = 0.02;
     text.x  = variants[,2];
