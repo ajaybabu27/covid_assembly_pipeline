@@ -1,6 +1,7 @@
 rule all:
 	input:
-		pdb_upload_check=os.environ.get("sample_folder")+'/pdb_upload_complete.txt'
+		pdb_upload_check=os.environ.get("sample_folder")+'/pdb_upload_complete.txt',
+		gt_file=os.environ.get("sample_folder")+'/genotype/'+'genotype_report.csv'
 
 rule assemble:
 	message: "Assembling SARS-CoV-2 genome"
@@ -73,11 +74,26 @@ rule vadr_analysis:
 		sample_name=os.environ.get("sample_name")		
 	output:
 		vadr_error_file=os.environ.get("sample_folder")+'/pipeline/VADR/VADR.vadr.fail.tbl'
-	shell:		
+	shell:
 		"python scripts/vadr_run.py {input.consensus_fasta_file} {params.sample_folder}/pipeline/VADR {params.sample_folder}/pipeline/VADR/VADR.gff /sc/arion/projects/PVI/db/vadr-models-corona-1.1-1"
 		#python scripts/vadr_run.py os.environ.get("sample_folder")+"/pipeline/"+os.environ.get("sample_name")+".fasta" os.environ.get("sample_folder")+"/pipeline/VADR" os.environ.get("sample_folder")+"/pipeline/VADR/VADR.gff" /sc/arion/projects/PVI/db/vadr-models-corona-1.1-1
-		
-		
+
+rule genotyping:
+	message: "Perform Nextclade analysis to genotype the SARS-CoV-2 genome"
+	input: 
+	    consensus_fasta_file=os.environ.get("sample_folder")+'/pipeline/'+os.environ.get("sample_name")+'.fasta'
+	params:
+		sample_folder=os.environ.get("sample_folder"),	
+		sample_name=os.environ.get("sample_name")
+	output:
+	    gt_file=os.environ.get("sample_folder")+'/genotype/'+'genotype_report.csv'
+	shell:
+	    """
+	    #bash scripts/run-nextclade.sh {input.consensus_fasta_file} {params.sample_folder}/genotype/nextclade.tsv
+	    nextclade -i {input.consensus_fasta_file} -t {params.sample_folder}/genotype/nextclade.tsv
+	    python scripts/nextclade_parse.py {params.sample_folder}/genotype/nextclade.tsv {params.sample_folder}/genotype/genotype_report.csv	    	    
+	    """
+
 rule push_data_pathogendb:
 	message: "Push genome assembly data to pathogenDB"
 	input:
