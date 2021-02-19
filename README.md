@@ -31,12 +31,12 @@ The following folder structure should exist for <sample_folder>
 ```
 <sample_folder>
 └───<sample_library1>'
-│   │   <read_prefix>_1.fastq.gz
-│   │   <read_prefix>_2.fastq.gz
+│   │   <read_prefix>_R1_001.fastq.gz
+│   │   <read_prefix>_R2_001.fastq.gz
 │
 └───<sample_library2>
-    │   <read_prefix>_1.fastq.gz
-    │   <read_prefix>_2.fastq.gz
+    │   <read_prefix>_R1_001.fastq.gz
+    │   <read_prefix>_R2_001.fastq.gz
 ```
 
 n.b. can be run on one to as many read files as needed, each pair of reads should have it's own folder. 
