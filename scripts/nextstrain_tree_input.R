@@ -22,15 +22,9 @@ pvi_fasta<-Sys.getenv("PVI_fasta")
 admit_status_report<-Sys.getenv("admit_status_report")
 driver_file<-Sys.getenv("MSSQL_driver")
 
-next_dir<-"ncov"
-next_meta<-"ncov/data/metadata_2021-01-04_10-09.tsv"
-pvi_fasta<-"ncov/data/PVI_fasta.fasta"
-admit_status_report<-"ncov/data/2021_01_06_covid_admit_status.txt"
-driver_file<-Sys.getenv("MSSQL_driver")
-
 
 #Read PHI DB credentials
-phi_cred<-as.data.frame(t(read.table('/sshfs/chimera/hpc/users/gonzaa51/.my.cnf.phidb',sep='=')))
+phi_cred<-as.data.frame(t(read.table('~/.my.cnf.phidb',sep='=')))
 phi_cred<-phi_cred %>%
   mutate_all(as.character)
 
@@ -44,7 +38,7 @@ con <- dbConnect(odbc(),
 
 
 #Read PDB credentials
-pdb_cred<-as.data.frame(t(read.table('/sshfs/chimera/hpc/users/gonzaa51/.my.cnf.pdbrw',sep='=')))
+pdb_cred<-as.data.frame(t(read.table('~/.my.cnf.pdbrw',sep='=')))
 pdb_cred<-pdb_cred %>%
   mutate_all(as.character)
 
@@ -165,7 +159,7 @@ for(row in 1:nrow(isolate_table)){
   
   
   insert_row=c(sample,'ncov','?','?',date,'North America','USA','New York','?','?','?','?','genome',length,'Human',age,gender,'?','?','?',
-               'MSHS Clinical Microbiology Laboratories','MSHS Pathogen Surveillance Program','?','?','?','?','2021-01-06','NY','SINAI',hospital,
+               'MSHS Clinical Microbiology Laboratories','MSHS Pathogen Surveillance Program','?','?','?','?','2020-03-16','NY','SINAI',hospital,
                zipcode,city,borough,neighborhood,race,hosp_status,psp_investigation_id)
   
   nextstrain_metadata<-rbind(nextstrain_metadata,insert_row)
